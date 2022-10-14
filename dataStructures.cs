@@ -1,20 +1,29 @@
-namespace project3;
+namespace project3
+{
 
+    public enum TOKENTYPES
+    {
+        SEMICOLON,
+        DERIVES,
+        ALSODERIVES,
+        EPSILON,
+        SYMBOL
+    }
 
-public enum TOKENTYPES {
-    SEMICOLON,
-    DERIVES,
-    ALSODERIVES,
-    EPSILON,
-    SYMBOL
-}
+    public class TOKEN
+    {
+        public TOKENTYPES token;
+        public String val;
 
-public class TOKEN {
-    public TOKENTYPES token;
-    public String val;
+        public TOKEN(TOKENTYPES incTok, string incVal)
+        {
+            token = incTok;
+            val = incVal;
+        }
 
-    public TOKEN (TOKENTYPES incTok, string incVal) {
-        token = incTok;
-        val = incVal;
+        public override string ToString()
+        {
+            return "<" + token.ToString() + ", " + val.ToString() + ">";
+        }
     }
 }

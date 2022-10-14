@@ -6,6 +6,8 @@
     <RootNamespace>p3_thefriedpickles</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ApplicationIcon />
+    <StartupObject></StartupObject>
   </PropertyGroup>
 
 </Project>
