@@ -16,9 +16,17 @@ namespace project3 {
         public int ScannerDriver(string filepath) {
 
             String allText = File.ReadAllText(filepath);
-            allText = allText.Replace("\n", "");
+            String newText = "";
+            foreach(char c in allText){
+                if(c >= 65 && c <= 127 || c == 32 || c == 58 || c == 59){
+                    newText += c;
+                }
+                if(c == '\n'){
+                    newText += ' ';
+                }
+            }
 
-            String[] strlist = allText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            String[] strlist = newText.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             foreach (String word in strlist) {
 
