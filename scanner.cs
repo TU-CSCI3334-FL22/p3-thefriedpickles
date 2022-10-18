@@ -30,7 +30,6 @@ namespace project3 {
 
             foreach (String word in strlist) {
 
-                Console.WriteLine($"{word} has length {word.Length}");
                 if (word == ":") {
                     tokens.Add(new TOKEN(TOKENTYPES.DERIVES, ":"));
                 } else if (word == ";") {
@@ -39,6 +38,9 @@ namespace project3 {
                     tokens.Add(new TOKEN(TOKENTYPES.EPSILON, " epsilon "));
                 } else if (word == "|") {
                     tokens.Add(new TOKEN(TOKENTYPES.ALSODERIVES, "|"));
+                } else {
+                    symbolTable.Add(word);
+                    tokens.Add(new TOKEN(TOKENTYPES.SYMBOL, word));
                 }
             }
 
