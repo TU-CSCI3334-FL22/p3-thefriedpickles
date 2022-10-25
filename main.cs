@@ -20,8 +20,6 @@ namespace project3
             //Console.WriteLine("Hello world");
             Scanner scan = new Scanner();
             scan.ScannerDriver("D:\\School\\Fall 2022\\Functional Languages\\p3-thefriedpickles\\grammars\\Parens");
-
-            Utils util = new Utils();
             //util.PrintHashSet(scan.symbolTable);
 
             //util.PrintList(scan.tokens);
@@ -33,9 +31,18 @@ namespace project3
                 Console.WriteLine("Failed parsing");
             } else {
                 //util.PrintProductions(parse.productions);
-                util.PrintFormedTable(parse.formedTable);
+                //util.PrintFormedTable(parse.formedTable);
                 Console.WriteLine("Successfully Parsed");
             }
+
+            TableGenerator tableGenerator = new TableGenerator(parse.formedTable);
+            //Utils.PrintHashSet(tableGenerator.allsymbols);
+            //Utils.PrintHashSet(tableGenerator.terminals);
+            //Utils.PrintHashSet(tableGenerator.nonterminals);
+
+            tableGenerator.computeFirstSet();
+
+            Utils.PrintSet(tableGenerator._firstSet);
 
             Console.ReadLine();
         }

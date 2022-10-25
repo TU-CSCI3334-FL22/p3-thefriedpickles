@@ -35,7 +35,7 @@ namespace project3 {
                 } else if (word == ";") {
                     tokens.Add(new TOKEN(TOKENTYPES.SEMICOLON, ";"));
                 } else if (word == "epsilon" || word == "EPSILON" || word == "Epsilon") {
-                    tokens.Add(new TOKEN(TOKENTYPES.EPSILON, " epsilon "));
+                    tokens.Add(new TOKEN(TOKENTYPES.EPSILON, "epsilon"));
                 } else if (word == "|") {
                     tokens.Add(new TOKEN(TOKENTYPES.ALSODERIVES, "|"));
                 } else {

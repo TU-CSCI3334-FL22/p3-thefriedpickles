@@ -26,7 +26,6 @@ namespace project3 {
 
         public void constructFullyFormedTable(){
             foreach(Tuple<string, List<string>> elem in productions){
-                Console.WriteLine("Current elem is: " + elem.Item1);
                 if(!formedTable.ContainsKey(elem.Item1)){
                     formedTable.Add(elem.Item1, new List<List<string>>());
                 }

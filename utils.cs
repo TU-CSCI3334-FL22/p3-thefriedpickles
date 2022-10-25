@@ -1,10 +1,10 @@
 namespace project3
 {
 
-    public class Utils
+    public static class Utils
     {
 
-        public void PrintHashSet(HashSet<string> inc)
+        public static void PrintHashSet(HashSet<string> inc)
         {
             foreach (string thing in inc)
             {
@@ -14,7 +14,18 @@ namespace project3
             Console.WriteLine();
         }
 
-        public void PrintList(List<TOKEN> inc)
+        public static void PrintHashSet(HashSet<string> inc, string label)
+        {
+            Console.Write(label + " ");
+            foreach (string thing in inc)
+            {
+                Console.Write(thing + ", ");
+            }
+
+            Console.WriteLine();
+        }
+
+        public static void PrintList(List<TOKEN> inc)
         {
             foreach (TOKEN thing in inc)
             {
@@ -24,7 +35,17 @@ namespace project3
             Console.WriteLine();
         }
 
-        public void PrintProductions(List<Tuple<string, List<string>>> productions){
+        public static void PrintList(List<string> inc)
+        {
+            foreach (string thing in inc)
+            {
+                Console.Write(thing.ToString() + " ");
+            }
+
+            Console.WriteLine();
+        }
+
+        public static void PrintProductions(List<Tuple<string, List<string>>> productions){
             Console.WriteLine("| " + PadString(15, "LeftHandSide") + " -> " + PadString(15, "RightHandSide") + " |");
             Console.WriteLine("|--------------------------------------|"); 
 
@@ -38,7 +59,7 @@ namespace project3
             }
         }
 
-        public void PrintFormedTable(Dictionary<string, List<List<string>>> dict){
+        public static void PrintFormedTable(Dictionary<string, List<List<string>>> dict){
             foreach(string key in dict.Keys){
                 Console.WriteLine(key);
                 foreach(List<string> list in dict[key]){
@@ -51,7 +72,7 @@ namespace project3
             }
         }
 
-        public string PadString(int spacing, string toPrint) {
+        public static string PadString(int spacing, string toPrint) {
             string ret = toPrint;
 
             if(spacing < toPrint.Length){
@@ -62,6 +83,18 @@ namespace project3
                 ret += " ";
             }
             return ret;
+        }
+
+        public static void PrintSet(Dictionary<string, HashSet<string>> set){
+            foreach(string key in set.Keys){
+                Console.Write(key + " | { ");
+                foreach(string elem in set[key]){
+                    Console.Write(elem + " ");
+                }
+                Console.Write("}");
+                Console.WriteLine();
+            }
+            
         }
 
     }
