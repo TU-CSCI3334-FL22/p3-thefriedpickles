@@ -19,7 +19,7 @@ namespace project3
 
             //Console.WriteLine("Hello world");
             Scanner scan = new Scanner();
-            scan.ScannerDriver("D:\\School\\Fall 2022\\Functional Languages\\p3-thefriedpickles\\grammars\\Parens");
+            scan.ScannerDriver("C:\\Users\\opjve\\Repos\\VSCode\\Compilers\\p3-thefriedpickles\\grammars\\Parens");
             //util.PrintHashSet(scan.symbolTable);
 
             //util.PrintList(scan.tokens);

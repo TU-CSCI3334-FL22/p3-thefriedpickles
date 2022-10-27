@@ -90,6 +90,37 @@ namespace project3 {
         }
 
         public void computeFollowSet(){
+            _followSet(nonterminals[0]) = "eof";
+
+            bool hasChanged = true;
+            while(hasChanged) {
+                hasChanged = false;
+
+                foreach(string key in _internalFormedTable.Keys){
+                    HashSet<string> prevSet = _followSet[key].ToHashSet<string>();
+
+                    foreach(List<string> production in _internalFormedTable[key]){
+                        HashSet<string> trailer = _followSet(key);
+
+                        for(int i = production.Length() - 1; i >= 0; i--) {
+                            if(nonterminals.Contains(production[i])) {
+                                _followSet(production[i]) = trailer.Union(_followSet(production[i]).ToHashSet<string>()).ToHashSet<string>();
+
+                                if(_firstSet(production[i]).Contains(epi)) {
+                                    trailer = trailer.Union(_firstSet[production[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                                } else {
+                                    trailer = _firstSet(production[i]);
+                                }
+                            } else {
+                                trailer = _firstSet(production[i]);
+                            }
+                        }
+                    }
+                    if(!hashSetsEqual(prevSet, _followSet[key])){
+                        hasChanged = true;
+                    }
+                }
+            }
 
         }
 
