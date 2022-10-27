@@ -5,10 +5,16 @@ namespace project3
         static void Main(string[] args)
         {
             // Display the number of command line arguments.
+            string filename = "Parens";
             if(args.Length > 0)
             {
                 Console.WriteLine("Arguments Passed by the Programmer:");  
-              
+                List<string> arguments = args.ToList();
+
+                if(arguments.Contains("-file")){
+                    int index = arguments.IndexOf("-file");
+                    filename = arguments[index+1];
+                }
                 // To print the command line 
                 // arguments using foreach loop
                 foreach(Object obj in args)  
@@ -19,7 +25,7 @@ namespace project3
 
             //Console.WriteLine("Hello world");
             Scanner scan = new Scanner();
-            scan.ScannerDriver("C:\\Users\\opjve\\Repos\\VSCode\\Compilers\\p3-thefriedpickles\\grammars\\Parens");
+            scan.ScannerDriver(Directory.GetCurrentDirectory() + "\\" + filename);
             //util.PrintHashSet(scan.symbolTable);
 
             //util.PrintList(scan.tokens);
@@ -45,7 +51,9 @@ namespace project3
             tableGenerator.computeNextSet();
 
             Utils.PrintSet(tableGenerator._firstSet);
+            Console.WriteLine("===============");
             Utils.PrintSet(tableGenerator._followSet);
+            Console.WriteLine("===============");
             Utils.PrintSet(tableGenerator._nextSet);
 
             Console.ReadLine();

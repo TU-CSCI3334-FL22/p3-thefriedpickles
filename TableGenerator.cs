@@ -33,9 +33,7 @@ namespace project3 {
             }
 
             terminals.Add("eof");
-            terminals.Add("ε");
             allsymbols.Add("eof");
-            allsymbols.Add("ε");
 
 
             foreach(string symbol in allsymbols){
@@ -45,7 +43,7 @@ namespace project3 {
             }
         }
 
-        static string epi = "ε";
+        static string epi = "epsilon";
         HashSet<string> episet = new HashSet<string>(){epi};
 
         public void computeFirstSet() {
@@ -90,6 +88,7 @@ namespace project3 {
         }
 
         public void computeFollowSet(){
+
             _followSet[nonterminals.ElementAt(0)].Add("eof");
 
             bool hasChanged = true;
@@ -97,22 +96,32 @@ namespace project3 {
                 hasChanged = false;
 
                 foreach(string key in _internalFormedTable.Keys){
+
+                    //Console.WriteLine("Key: " + key);
                     HashSet<string> prevSet = _followSet[key].ToHashSet<string>();
+                    //Utils.PrintHashSet(prevSet, "Previous Set");
 
                     foreach(List<string> production in _internalFormedTable[key]){
                         HashSet<string> trailer = _followSet[key];
+                        //Utils.PrintHashSet(trailer, "Trailer:");
 
                         for(int i = production.Count() - 1; i >= 0; i--) {
                             if(nonterminals.Contains(production[i])) {
+
+                                //Console.WriteLine("NonTerminals");
+
                                 _followSet[production[i]] = trailer.Union(_followSet[production[i]].ToHashSet<string>()).ToHashSet<string>();
 
                                 if(_firstSet[production[i]].Contains(epi)) {
                                     trailer = trailer.Union(_firstSet[production[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
                                 } else {
-                                    trailer = _firstSet[production[i]];
+                                    trailer = _firstSet[production[i]].ToHashSet<string>();
                                 }
+                                //Utils.PrintHashSet(trailer, "Trailer:");
+
                             } else {
-                                trailer = _firstSet[production[i]];
+                                ///Console.WriteLine("Terminals");
+                                trailer = _firstSet[production[i]].ToHashSet<string>();
                             }
                         }
                     }
@@ -126,6 +135,11 @@ namespace project3 {
 
         public void computeNextSet(){
             bool hasChanged = true;
+
+            foreach(string t in terminals){
+                _nextSet[t].Add(t);
+            }
+
             while(hasChanged) {
                 hasChanged = false;
 
@@ -135,13 +149,40 @@ namespace project3 {
                     foreach(List<string> production in _internalFormedTable[key]){
                         HashSet<string> trailer = _nextSet[key];
 
-                        for(int i = production.Count() - 1; i >= 0; i--) {
-                            if(_firstSet[production[i]].Contains(epi)) {
-                                trailer = trailer.Union(_firstSet[production[i]].ToHashSet<string>()).Union(_followSet[key]).ToHashSet<string>();
-                            } else {
-                                trailer = trailer.Union(_firstSet[production[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                        int n = 0;
+                        bool allHaveEpi = true;
+                        foreach(string elem in production) {
+                            if(!_firstSet[elem].Contains(epi)) {
+                                allHaveEpi = false;
+                                n = production.IndexOf(elem);
+                                break;
                             }
                         }
+
+                        Console.WriteLine("Key: " + key);
+                        Console.WriteLine("N: " + n);
+
+                        if(allHaveEpi){
+                            Console.WriteLine("All productions have epsilon in the firsts");
+                            HashSet<string> allFirsts = new HashSet<string>();
+                            foreach(string elem in production){
+                                foreach(string first in _firstSet[elem]){
+                                    allFirsts.Add(first);
+                                }
+                            }
+
+                            _nextSet[key] = _nextSet[key].Union(allFirsts.Union(_followSet[key]).ToHashSet<string>()).ToHashSet<string>();
+                        } else {
+                            Console.WriteLine("Not all elemens have epsilon in the firsts");
+                            HashSet<string> allFirsts = new HashSet<string>();
+                            for(int i = 0; i <= n; i++){
+                                foreach(string first in _firstSet[production[i]]){
+                                    allFirsts.Add(first);
+                                }
+                            }
+                            _nextSet[key] = _nextSet[key].Union(allFirsts.Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                        }
+
                     }
                     if(!hashSetsEqual(prevSet, _nextSet[key])){
                         hasChanged = true;
