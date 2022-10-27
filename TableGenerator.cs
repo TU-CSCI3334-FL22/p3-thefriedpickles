@@ -90,7 +90,7 @@ namespace project3 {
         }
 
         public void computeFollowSet(){
-            _followSet(nonterminals[0]) = "eof";
+            _followSet[nonterminals.ElementAt(0)].Add("eof");
 
             bool hasChanged = true;
             while(hasChanged) {
@@ -100,19 +100,19 @@ namespace project3 {
                     HashSet<string> prevSet = _followSet[key].ToHashSet<string>();
 
                     foreach(List<string> production in _internalFormedTable[key]){
-                        HashSet<string> trailer = _followSet(key);
+                        HashSet<string> trailer = _followSet[key];
 
-                        for(int i = production.Length() - 1; i >= 0; i--) {
+                        for(int i = production.Count() - 1; i >= 0; i--) {
                             if(nonterminals.Contains(production[i])) {
-                                _followSet(production[i]) = trailer.Union(_followSet(production[i]).ToHashSet<string>()).ToHashSet<string>();
+                                _followSet[production[i]] = trailer.Union(_followSet[production[i]].ToHashSet<string>()).ToHashSet<string>();
 
-                                if(_firstSet(production[i]).Contains(epi)) {
+                                if(_firstSet[production[i]].Contains(epi)) {
                                     trailer = trailer.Union(_firstSet[production[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
                                 } else {
-                                    trailer = _firstSet(production[i]);
+                                    trailer = _firstSet[production[i]];
                                 }
                             } else {
-                                trailer = _firstSet(production[i]);
+                                trailer = _firstSet[production[i]];
                             }
                         }
                     }
@@ -125,7 +125,29 @@ namespace project3 {
         }
 
         public void computeNextSet(){
+            bool hasChanged = true;
+            while(hasChanged) {
+                hasChanged = false;
 
+                foreach(string key in _internalFormedTable.Keys){
+                    HashSet<string> prevSet = _nextSet[key].ToHashSet<string>();
+
+                    foreach(List<string> production in _internalFormedTable[key]){
+                        HashSet<string> trailer = _nextSet[key];
+
+                        for(int i = production.Count() - 1; i >= 0; i--) {
+                            if(_firstSet[production[i]].Contains(epi)) {
+                                trailer = trailer.Union(_firstSet[production[i]].ToHashSet<string>()).Union(_followSet[key]).ToHashSet<string>();
+                            } else {
+                                trailer = trailer.Union(_firstSet[production[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                            }
+                        }
+                    }
+                    if(!hashSetsEqual(prevSet, _nextSet[key])){
+                        hasChanged = true;
+                    }
+                }
+            }
         }
 
         bool hashSetsEqual(HashSet<string> a, HashSet<string> b){

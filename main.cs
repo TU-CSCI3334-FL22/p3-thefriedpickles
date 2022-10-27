@@ -41,8 +41,12 @@ namespace project3
             //Utils.PrintHashSet(tableGenerator.nonterminals);
 
             tableGenerator.computeFirstSet();
+            tableGenerator.computeFollowSet();
+            tableGenerator.computeNextSet();
 
             Utils.PrintSet(tableGenerator._firstSet);
+            Utils.PrintSet(tableGenerator._followSet);
+            Utils.PrintSet(tableGenerator._nextSet);
 
             Console.ReadLine();
         }
