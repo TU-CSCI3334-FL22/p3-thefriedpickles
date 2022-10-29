@@ -56,7 +56,7 @@ namespace project3
             Console.WriteLine("===============");
             Utils.PrintSet(tableGenerator._nextSet);
             Console.WriteLine("===============");
-            Yaml.PrintYaml(parse.formedTable);
+            Yaml.PrintYaml(parse.formedTable, tableGenerator._nextSet);
 
             Console.ReadLine();
         }

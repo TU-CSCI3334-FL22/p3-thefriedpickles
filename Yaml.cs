@@ -23,7 +23,7 @@ namespace project3
         }
         Console.Write("]");
         }
-        public static void PrintYaml(Dictionary<string, List<List<string>>> table){
+        public static void PrintYaml(Dictionary<string, List<List<string>>> table, Dictionary<string, HashSet<string>> next){
             foreach(string key in table.Keys){
                 nonterms.Add(key);
                 allSymbols.Add(key);
@@ -47,6 +47,8 @@ namespace project3
             Console.WriteLine("error-marker: --");
             Console.WriteLine("start-symbol: "+nonterms[0]);
             int count = 0;
+
+            //Display Grammar
             Console.WriteLine("productions: ");
             foreach(string key in table.Keys){
                 foreach (List<string> prod in table[key]){
@@ -57,7 +59,34 @@ namespace project3
                     Console.WriteLine();
                 }
             }
-        
+
+            //Display Next Table
+            int index = 0;
+            string showIndx = "";
+            Console.WriteLine("table: ");
+            foreach(string nt in nonterms) {
+                Console.Write("\t" + nt + ": {");
+                foreach(string t in terms) {
+                    if(next[nt].Contains(t)) {
+                        index = 10;     //placeholder
+                    }
+                    else 
+                        index = -1;
+                    
+                    if(index == -1)
+                        showIndx = "--";
+                    else
+                        showIndx = "" + index;
+
+                    Console.Write(t + ": " + showIndx);
+                    if(t == terms[terms.Count - 1])
+                        Console.Write(", eof: " + showIndx);
+                    else
+                        Console.Write(", ");
+                }
+                Console.Write("}");
+                Console.WriteLine();
+            }
         }
     }
 }
