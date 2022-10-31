@@ -55,15 +55,15 @@ namespace project3 {
                 _firstSet[t].Add(t);
             }
 
-            bool hasChanged = true;
-            while(hasChanged) {
-                hasChanged = false;
-
+            List<string> tempProd = new List<string>();
+            do {
                 foreach(string key in _internalFormedTable.Keys){
                     HashSet<string> prevSet = _firstSet[key].ToHashSet<string>();
+                    worklist = _internalFormedTable[key].ToHashSet<List<string>>();
 
-                    foreach(List<string> production in _internalFormedTable[key]){
+                    foreach(List<string> production in worklist){
                         int i = 0;
+                        tempProd = production;
                         //Utils.PrintHashSet(_firstSet[production[0]]);
                         HashSet<string> firstBi = _firstSet[production[0]];
                         //Utils.PrintHashSet(firstBi, "firstBi:");
@@ -77,18 +77,19 @@ namespace project3 {
                             rhs = rhs.Union(_firstSet[production[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
                         }
 
-                        if( i == k && _firstSet[production[k]].Contains(epi)){
+                        if(i == k && _firstSet[production[k]].Contains(epi)){
                             rhs = rhs.Union(episet).ToHashSet();
                         }
 
                         _firstSet[key] = _firstSet[key].Union(rhs).ToHashSet<string>();
+
                     }
                     
-                    if(!hashSetsEqual(prevSet, _firstSet[key])){
-                        hasChanged = true;
+                    if(hashSetsEqual(prevSet, _firstSet[key])){
+                        worklist.Remove(tempProd);
                     }
                 }
-            }
+            } while(worklist.Count > 0);
         }
 
         public void computeFollowSet(){
