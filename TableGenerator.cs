@@ -6,11 +6,15 @@ namespace project3 {
 
         public Dictionary<string, HashSet<string>> _nextSet = new Dictionary<string, HashSet<string>>();
 
+        public ListWithDuplicates _yamlNext = new ListWithDuplicates();
+
         Dictionary<string, List<List<string>>> _internalFormedTable = new Dictionary<string, List<List<string>>>();
 
         public HashSet<string> terminals = new HashSet<string>();
         public HashSet<string> nonterminals = new HashSet<string>();
         public HashSet<string> allsymbols = new HashSet<string>();
+
+        public HashSet<List<string>> worklist = new HashSet<List<string>>();
 
         public TableGenerator(Dictionary<string, List<List<string>>> internalFormedTable){
             _internalFormedTable = internalFormedTable;
@@ -135,6 +139,7 @@ namespace project3 {
 
         public void computeNextSet(){
             bool hasChanged = true;
+            int indx = 0;
 
             foreach(string t in terminals){
                 _nextSet[t].Add(t);
@@ -159,21 +164,21 @@ namespace project3 {
                             }
                         }
 
-                        Console.WriteLine("Key: " + key);
-                        Console.WriteLine("N: " + n);
+                        //Console.WriteLine("Key: " + key);
+                        //Console.WriteLine("N: " + n);
 
                         if(allHaveEpi){
-                            Console.WriteLine("All productions have epsilon in the firsts");
+                            //Console.WriteLine("All productions have epsilon in the firsts");
                             HashSet<string> allFirsts = new HashSet<string>();
                             foreach(string elem in production){
                                 foreach(string first in _firstSet[elem]){
                                     allFirsts.Add(first);
                                 }
                             }
-
                             _nextSet[key] = _nextSet[key].Union(allFirsts.Union(_followSet[key]).ToHashSet<string>()).ToHashSet<string>();
+                            _yamlNext.Add(indx, key, allFirsts.Union(_followSet[key]).ToHashSet<string>());
                         } else {
-                            Console.WriteLine("Not all elemens have epsilon in the firsts");
+                            //Console.WriteLine("Not all elemens have epsilon in the firsts");
                             HashSet<string> allFirsts = new HashSet<string>();
                             for(int i = 0; i <= n; i++){
                                 foreach(string first in _firstSet[production[i]]){
@@ -181,8 +186,9 @@ namespace project3 {
                                 }
                             }
                             _nextSet[key] = _nextSet[key].Union(allFirsts.Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                            _yamlNext.Add(indx, key, allFirsts.Except(episet).ToHashSet<string>());
                         }
-
+                        indx++;
                     }
                     if(!hashSetsEqual(prevSet, _nextSet[key])){
                         hasChanged = true;
@@ -211,4 +217,16 @@ namespace project3 {
             return true;
         }
     }
+
+    public class ListWithDuplicates : List<(int, KeyValuePair<string, HashSet<string>>)> {
+        public void Add(int num, string key, HashSet<string> value) {
+            var element = new KeyValuePair<string, HashSet<string>>(key, value);
+            this.Add((num, element));
+        }
+        public void Remove(int num, string key, HashSet<string> value) {
+            var element = new KeyValuePair<string, HashSet<string>>(key, value);
+            this.Remove((num, element));
+        }
+    }
+    
 }
