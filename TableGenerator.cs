@@ -2,7 +2,11 @@ namespace project3 {
     public class TableGenerator {
         public Dictionary<string, HashSet<string>> _firstSet = new Dictionary<string, HashSet<string>>();
 
+        public Dictionary<string, HashSet<string>> _firstSetWork = new Dictionary<string, HashSet<string>>();
+
         public Dictionary<string, HashSet<string>> _followSet = new Dictionary<string, HashSet<string>>();
+
+        public Dictionary<string, HashSet<string>> _followSetWork = new Dictionary<string, HashSet<string>>();
 
         public Dictionary<string, HashSet<string>> _nextSet = new Dictionary<string, HashSet<string>>();
 
@@ -42,7 +46,9 @@ namespace project3 {
 
             foreach(string symbol in allsymbols){
                 _firstSet.Add(symbol, new HashSet<string>());
+                _firstSetWork.Add(symbol, new HashSet<string>());
                 _followSet.Add(symbol, new HashSet<string>());
+                _followSetWork.Add(symbol, new HashSet<string>());
                 _nextSet.Add(symbol, new HashSet<string>());
             }
         }
@@ -90,7 +96,60 @@ namespace project3 {
                 }
             }
         }
+        public void computeFirstSetWorklist() {
+            List<Tuple<string, List<string>>> worklist = new List<Tuple<string, List<string>>>();
 
+            foreach(string key in _internalFormedTable.Keys){
+                    foreach(List<string> production in _internalFormedTable[key]){
+                        worklist.Add(Tuple.Create(key, production));
+                    }
+            }
+            foreach(string t in terminals){
+                _firstSetWork[t].Add(t);
+            }
+
+            //bool hasChanged = true;
+            while(worklist.Count != 0) {
+                //hasChanged = false;
+
+                    Tuple<string, List<string>> item = worklist[0];
+                    HashSet<string> prevSet = _firstSetWork[item.Item1].ToHashSet<string>();
+
+                        int i = 0;
+                        //Utils.PrintHashSet(_firstSet[production[0]]);
+                        HashSet<string> firstBi = _firstSetWork[item.Item2[0]];
+                        //Utils.PrintHashSet(firstBi, "firstBi:");
+                        HashSet<string> rhs = firstBi.Except(episet).ToHashSet<string>();
+                        //Utils.PrintHashSet(rhs, "rhs:");
+                        
+                        int k = item.Item2.Count-1;
+
+                        while(_firstSetWork[item.Item2[i]].Contains(epi) && i < k){
+                            i += 1;
+                            rhs = rhs.Union(_firstSetWork[item.Item2[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                        }
+
+                        if( i == k && _firstSetWork[item.Item2[k]].Contains(epi)){
+                            rhs = rhs.Union(episet).ToHashSet();
+                        }
+
+                        _firstSetWork[item.Item1] = _firstSetWork[item.Item1].Union(rhs).ToHashSet<string>();
+                    
+                    worklist.Remove(item);
+                    //index++;
+                    if(!hashSetsEqual(prevSet, _firstSetWork[item.Item1])){
+                        //hasChanged = true;
+                         foreach(string key in _internalFormedTable.Keys){
+                        foreach(List<string> production in _internalFormedTable[key]){
+                            if(production.Contains(item.Item1) && !worklist.Contains(Tuple.Create(key, production))){
+                                worklist.Add(Tuple.Create(key, production));
+                            }
+                        }
+                    }
+                    }
+                }
+            
+        }
         public void computeFollowSet(){
 
             _followSet[nonterminals.ElementAt(0)].Add("eof");
@@ -136,7 +195,63 @@ namespace project3 {
             }
 
         }
+ public void computeFollowSetWorklist(){
+        List<Tuple<string, List<string>>> worklist = new List<Tuple<string, List<string>>>();
+        foreach(string key in _internalFormedTable.Keys){
+                    foreach(List<string> production in _internalFormedTable[key]){
+                        worklist.Add(Tuple.Create(key, production));
+                    }
+            }
+            _followSetWork[nonterminals.ElementAt(0)].Add("eof");
 
+            //bool hasChanged = true;
+            while(worklist.Count != 0) {
+               //hasChanged = false;
+                Tuple<string, List<string>> item = worklist[0];
+                    //Console.WriteLine("Key: " + key);
+                    HashSet<string> prevSet = _followSetWork[item.Item1].ToHashSet<string>();
+                    //Utils.PrintHashSet(prevSet, "Previous Set");
+
+                        HashSet<string> trailer = _followSetWork[item.Item1];
+                        //Utils.PrintHashSet(trailer, "Trailer:");
+
+                        for(int i = item.Item2.Count() - 1; i >= 0; i--) {
+                            if(nonterminals.Contains(item.Item2[i])) {
+
+                                //Console.WriteLine("NonTerminals");
+
+                                _followSetWork[item.Item2[i]] = trailer.Union(_followSetWork[item.Item2[i]].ToHashSet<string>()).ToHashSet<string>();
+
+                                if(_firstSetWork[item.Item2[i]].Contains(epi)) {
+                                    trailer = trailer.Union(_firstSetWork[item.Item2[i]].Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                                } else {
+                                    trailer = _firstSetWork[item.Item2[i]].ToHashSet<string>();
+                                }
+                                //Utils.PrintHashSet(trailer, "Trailer:");
+
+                            } else {
+                                ///Console.WriteLine("Terminals");
+                                trailer = _firstSetWork[item.Item2[i]].ToHashSet<string>();
+                            }
+                        }
+                        worklist.Remove(item);
+                        if(!hashSetsEqual(prevSet, _followSetWork[item.Item1])){
+                            foreach (string b in item.Item2){
+                                if(nonterminals.Contains(b)){
+                                    foreach(List<string> prod in  _internalFormedTable[b]){
+                                        if(!worklist.Contains(Tuple.Create(b,prod))){
+                                            worklist.Add(Tuple.Create(b,prod));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                
+            
+
+        }
         public void computeNextSet(){
             bool hasChanged = true;
             int indx = 0;
@@ -171,17 +286,17 @@ namespace project3 {
                             //Console.WriteLine("All productions have epsilon in the firsts");
                             HashSet<string> allFirsts = new HashSet<string>();
                             foreach(string elem in production){
-                                foreach(string first in _firstSet[elem]){
+                                foreach(string first in _firstSetWork[elem]){
                                     allFirsts.Add(first);
                                 }
                             }
-                            _nextSet[key] = _nextSet[key].Union(allFirsts.Union(_followSet[key]).ToHashSet<string>()).ToHashSet<string>();
-                            _yamlNext.Add(indx, key, allFirsts.Union(_followSet[key]).ToHashSet<string>());
+                            _nextSet[key] = _nextSet[key].Union(allFirsts.Union(_followSetWork[key]).ToHashSet<string>()).ToHashSet<string>();
+                            _yamlNext.Add(indx, key, allFirsts.Union(_followSetWork[key]).ToHashSet<string>());
                         } else {
                             //Console.WriteLine("Not all elemens have epsilon in the firsts");
                             HashSet<string> allFirsts = new HashSet<string>();
                             for(int i = 0; i <= n; i++){
-                                foreach(string first in _firstSet[production[i]]){
+                                foreach(string first in _firstSetWork[production[i]]){
                                     allFirsts.Add(first);
                                 }
                             }

@@ -4,7 +4,6 @@ namespace project3
         public static List<string> nonterms = new List<string>();
         public static List<string> terms = new List<string>();
         public static List<string> allSymbols = new List<string>();
-
         public static HashSet<string> terminals = new HashSet<string>();
 
         public static void fancyPrintList(string wing, List<string> lst){
@@ -89,9 +88,11 @@ namespace project3
                 Console.Write("\t" + next[nt].Item2.Key + ": {");
                 foreach(string t in terminals) {   
                     if(nt != 0) {
+                        /*
                         if(next[nt].Item2.Key == next[nt-1].Item2.Key && next[nt].Item2.Key != next[nt+1].Item2.Key) {
                             next.Remove(next[nt]);
                         }
+                        */
                     }
                     if(next[nt].Item2.Key == next[nt+1].Item2.Key && nt != next.Count -1) {
                         if(next[nt].Item2.Value.Contains(t)) {
