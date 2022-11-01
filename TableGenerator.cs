@@ -9,6 +9,7 @@ namespace project3 {
         public Dictionary<string, HashSet<string>> _followSetWork = new Dictionary<string, HashSet<string>>();
 
         public Dictionary<string, HashSet<string>> _nextSet = new Dictionary<string, HashSet<string>>();
+        public Dictionary<string, HashSet<string>> _nextSetWork = new Dictionary<string, HashSet<string>>();
 
         public ListWithDuplicates _yamlNext = new ListWithDuplicates();
 
@@ -50,6 +51,7 @@ namespace project3 {
                 _followSet.Add(symbol, new HashSet<string>());
                 _followSetWork.Add(symbol, new HashSet<string>());
                 _nextSet.Add(symbol, new HashSet<string>());
+                _nextSetWork.Add(symbol, new HashSet<string>());
             }
         }
 
@@ -195,7 +197,7 @@ namespace project3 {
             }
 
         }
- public void computeFollowSetWorklist(){
+    public void computeFollowSetWorklist(){
         List<Tuple<string, List<string>>> worklist = new List<Tuple<string, List<string>>>();
         foreach(string key in _internalFormedTable.Keys){
                     foreach(List<string> production in _internalFormedTable[key]){
@@ -252,6 +254,67 @@ namespace project3 {
             
 
         }
+
+        public void computeNextSetWorklist(){
+            bool hasChanged = true;
+            int indx = 0;
+
+            foreach(string t in terminals){
+                _nextSetWork[t].Add(t);
+            }
+
+            while(hasChanged) {
+                hasChanged = false;
+
+                foreach(string key in _internalFormedTable.Keys){
+                    HashSet<string> prevSet = _nextSetWork[key].ToHashSet<string>();
+
+                    foreach(List<string> production in _internalFormedTable[key]){
+                        HashSet<string> trailer = _nextSetWork[key];
+
+                        int n = 0;
+                        bool allHaveEpi = true;
+                        foreach(string elem in production) {
+                            if(!_firstSetWork[elem].Contains(epi)) {
+                                allHaveEpi = false;
+                                n = production.IndexOf(elem);
+                                break;
+                            }
+                        }
+
+                        //Console.WriteLine("Key: " + key);
+                        //Console.WriteLine("N: " + n);
+
+                        if(allHaveEpi){
+                            //Console.WriteLine("All productions have epsilon in the firsts");
+                            HashSet<string> allFirsts = new HashSet<string>();
+                            foreach(string elem in production){
+                                foreach(string first in _firstSetWork[elem]){
+                                    allFirsts.Add(first);
+                                }
+                            }
+                            _nextSetWork[key] = _nextSetWork[key].Union(allFirsts.Union(_followSetWork[key]).ToHashSet<string>()).ToHashSet<string>();
+                            _yamlNext.Add(indx, key, allFirsts.Union(_followSetWork[key]).ToHashSet<string>());
+                        } else {
+                            //Console.WriteLine("Not all elemens have epsilon in the firsts");
+                            HashSet<string> allFirsts = new HashSet<string>();
+                            for(int i = 0; i <= n; i++){
+                                foreach(string first in _firstSetWork[production[i]]){
+                                    allFirsts.Add(first);
+                                }
+                            }
+                            _nextSetWork[key] = _nextSetWork[key].Union(allFirsts.Except(episet).ToHashSet<string>()).ToHashSet<string>();
+                            _yamlNext.Add(indx, key, allFirsts.Except(episet).ToHashSet<string>());
+                        }
+                        indx++;
+                    }
+                    if(!hashSetsEqual(prevSet, _nextSet[key])){
+                        hasChanged = true;
+                    }
+                }
+            }
+        }
+
         public void computeNextSet(){
             bool hasChanged = true;
             int indx = 0;
@@ -286,17 +349,17 @@ namespace project3 {
                             //Console.WriteLine("All productions have epsilon in the firsts");
                             HashSet<string> allFirsts = new HashSet<string>();
                             foreach(string elem in production){
-                                foreach(string first in _firstSetWork[elem]){
+                                foreach(string first in _firstSet[elem]){
                                     allFirsts.Add(first);
                                 }
                             }
-                            _nextSet[key] = _nextSet[key].Union(allFirsts.Union(_followSetWork[key]).ToHashSet<string>()).ToHashSet<string>();
-                            _yamlNext.Add(indx, key, allFirsts.Union(_followSetWork[key]).ToHashSet<string>());
+                            _nextSet[key] = _nextSet[key].Union(allFirsts.Union(_followSet[key]).ToHashSet<string>()).ToHashSet<string>();
+                            _yamlNext.Add(indx, key, allFirsts.Union(_followSet[key]).ToHashSet<string>());
                         } else {
                             //Console.WriteLine("Not all elemens have epsilon in the firsts");
                             HashSet<string> allFirsts = new HashSet<string>();
                             for(int i = 0; i <= n; i++){
-                                foreach(string first in _firstSetWork[production[i]]){
+                                foreach(string first in _firstSet[production[i]]){
                                     allFirsts.Add(first);
                                 }
                             }
