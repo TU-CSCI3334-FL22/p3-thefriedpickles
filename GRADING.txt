@@ -1,0 +1,13 @@
+Interface: 5
+* Extra output on top of every file
+Scanner/Parser: 10
+Correctness: 50
+* Does seem to produce correct first/follow/next sets.
+YAML table: 3
+* Epsilons occuring as terminals in yaml output
+* Table in yaml output is not correct - it has one row per production, instead of per non-terminal.
+Worklists: 4
+* Worklists ARE implemented, do seem to be worklist algorithms, but produce even less-correct output
+  for the next tables. 
+Missing Points: 5
+Total: 77 (B0)
